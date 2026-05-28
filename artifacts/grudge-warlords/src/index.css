@@ -1,0 +1,353 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-border: hsl(var(--border));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --font-sans: var(--app-font-sans);
+  --font-serif: var(--app-font-serif);
+  --font-mono: var(--app-font-mono);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+}
+
+:root {
+  --background: 220 20% 6%;
+  --foreground: 210 30% 95%;
+  --card: 220 20% 10%;
+  --card-foreground: 210 30% 95%;
+  --border: 220 15% 18%;
+  --primary: 38 95% 55%;
+  --primary-foreground: 220 20% 6%;
+  --secondary: 220 15% 18%;
+  --secondary-foreground: 210 30% 85%;
+  --muted: 220 15% 14%;
+  --muted-foreground: 210 15% 55%;
+  --accent: 38 95% 55%;
+  --accent-foreground: 220 20% 6%;
+  --destructive: 0 75% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --input: 220 15% 18%;
+  --ring: 38 95% 55%;
+  --app-font-sans: 'Cinzel', 'Georgia', serif;
+  --app-font-serif: 'Cinzel', serif;
+  --app-font-mono: 'Fira Code', monospace;
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * { @apply border-border; box-sizing: border-box; }
+  html, body, #root { width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; }
+  body { @apply bg-background text-foreground font-sans antialiased; }
+}
+
+/* Game-specific styles */
+.game-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: none;
+}
+
+.hud-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.hud-overlay .pointer-events-auto {
+  pointer-events: auto;
+}
+
+/* ── Loading bar ────────────────────────────────────── */
+@keyframes loadingBar {
+  0%   { width: 5%; }
+  30%  { width: 45%; }
+  60%  { width: 72%; }
+  85%  { width: 88%; }
+  100% { width: 96%; }
+}
+.loading-bar {
+  animation: loadingBar 2.5s ease-out forwards;
+}
+
+/* ── Scanline effect for menu ───────────────────────── */
+.scanlines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.05) 2px,
+    rgba(0,0,0,0.05) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── Glow text ──────────────────────────────────────── */
+.glow-gold  { text-shadow: 0 0 20px rgba(255,180,0,0.8), 0 0 40px rgba(255,140,0,0.4); }
+.glow-red   { text-shadow: 0 0 20px rgba(255,50,50,0.8), 0 0 40px rgba(200,0,0,0.4); }
+.glow-blue  { text-shadow: 0 0 20px rgba(50,150,255,0.8), 0 0 40px rgba(0,80,200,0.4); }
+.glow-white { text-shadow: 0 0 10px rgba(255,255,255,0.6); }
+
+/* ── Crosshair ──────────────────────────────────────── */
+.crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 20;
+}
+.crosshair-line {
+  position: absolute;
+  background: rgba(255,255,255,0.85);
+  border-radius: 1px;
+  filter: drop-shadow(0 0 1px rgba(0,0,0,1));
+}
+.crosshair-dot {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: rgba(255,255,255,0.9);
+  border-radius: 50%;
+  transform: translate(-50%,-50%);
+  filter: drop-shadow(0 0 1px rgba(0,0,0,1));
+}
+
+/* ── Hit vignette (red edges on damage) ─────────────── */
+@keyframes hitFlash {
+  0%   { opacity: 0; }
+  15%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+.hit-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 45%, rgba(200,0,0,0.6) 100%);
+  pointer-events: none;
+  z-index: 15;
+  animation: hitFlash 0.5s ease-out forwards;
+}
+
+/* ── Ability slot ───────────────────────────────────── */
+.ability-slot {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  border: 2px solid rgba(255,180,0,0.4);
+  background: rgba(0,0,0,0.75);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ability-slot .cooldown-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0,0,100,0.55);
+  transition: height 0.1s linear;
+}
+
+.ability-slot .key-hint {
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  font-size: 10px;
+  color: rgba(255,200,0,0.9);
+  font-weight: bold;
+}
+
+/* Ability ready pulse */
+@keyframes abilityReady {
+  0%   { box-shadow: 0 0 0px rgba(255,230,0,0);  border-color: rgba(255,180,0,0.4); }
+  40%  { box-shadow: 0 0 22px rgba(255,230,0,0.9); border-color: rgba(255,230,0,1); }
+  100% { box-shadow: 0 0 0px rgba(255,230,0,0);  border-color: rgba(255,180,0,0.4); }
+}
+.ability-slot-ready {
+  animation: abilityReady 0.7s ease forwards;
+}
+
+/* ── Health / Mana / Stamina bars ───────────────────── */
+.health-bar-container {
+  height: 12px;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,50,50,0.5);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+.health-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #dc2626, #ef4444);
+  transition: width 0.15s ease;
+}
+.mana-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #1d4ed8, #3b82f6);
+  transition: width 0.15s ease;
+}
+.stamina-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #d97706, #f59e0b);
+  transition: width 0.15s ease;
+}
+
+/* ── Character card (select screen) ────────────────── */
+.char-card {
+  border: 2px solid rgba(255,180,0,0.2);
+  background: rgba(0,0,0,0.6);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.char-card:hover {
+  border-color: rgba(255,180,0,0.8);
+  background: rgba(255,150,0,0.1);
+  transform: scale(1.03);
+}
+.char-card.selected {
+  border-color: rgba(255,180,0,1.0);
+  background: rgba(255,150,0,0.2);
+  box-shadow: 0 0 20px rgba(255,180,0,0.4);
+}
+
+/* ── Kill feed ──────────────────────────────────────── */
+.kill-feed-item {
+  animation: fadeInOut 3s ease forwards;
+}
+@keyframes fadeInOut {
+  0%   { opacity: 0; transform: translateX(20px); }
+  10%  { opacity: 1; transform: translateX(0); }
+  80%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ── Floating damage numbers ────────────────────────── */
+.float-dmg {
+  animation: floatUp 1s ease forwards;
+  pointer-events: none;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px black, 0 0 4px black;
+}
+@keyframes floatUp {
+  0%   { opacity: 1;   transform: translateY(0) scale(1); }
+  20%  { opacity: 1;   transform: translateY(-10px) scale(1.2); }
+  100% { opacity: 0;   transform: translateY(-60px) scale(0.8); }
+}
+
+/* ── Respawn overlay ────────────────────────────────── */
+@keyframes respawnPulse {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1; }
+}
+.respawn-countdown {
+  animation: respawnPulse 1s ease-in-out infinite;
+}
+
+/* ── Menu button ────────────────────────────────────── */
+.menu-btn {
+  background: linear-gradient(135deg, rgba(255,180,0,0.15), rgba(200,120,0,0.05));
+  border: 1px solid rgba(255,180,0,0.4);
+  color: #fbbf24;
+  padding: 12px 32px;
+  font-size: 0.9rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  font-family: var(--app-font-sans);
+  border-radius: 4px;
+}
+.menu-btn:hover {
+  background: linear-gradient(135deg, rgba(255,180,0,0.3), rgba(200,120,0,0.15));
+  border-color: rgba(255,180,0,0.8);
+  box-shadow: 0 0 20px rgba(255,180,0,0.3);
+  transform: scale(1.02);
+}
+.menu-btn:active { transform: scale(0.98); }
+
+/* ── Control hint bar ───────────────────────────────── */
+.control-hint {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 16px;
+  background: rgba(0,0,0,0.7);
+  padding: 6px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,180,0,0.15);
+  font-size: 11px;
+  color: #9ca3af;
+  white-space: nowrap;
+  align-items: center;
+}
+.control-hint span { color: #fbbf24; font-weight: bold; }
+
+/* ── Enemy HP bar (above head) ──────────────────────── */
+.enemy-hp-bar {
+  position: absolute;
+  background: rgba(0,0,0,0.7);
+  border: 1px solid #ff4444;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+/* ── Pause / overlay backdrop ───────────────────────── */
+.pause-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.78);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+}
+
+/* ── Leaderboard row ────────────────────────────────── */
+.lb-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+.lb-row-player {
+  background: rgba(255,180,0,0.12);
+  border: 1px solid rgba(255,180,0,0.35);
+}
+.lb-row-other {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.05);
+}
