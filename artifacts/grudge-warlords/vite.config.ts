@@ -21,13 +21,11 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist"),
     emptyOutDir: true,
+    sourcemap: false,
+    reportCompressedSize: false,
+    chunkSizeWarningLimit: 2000,
     rollupOptions: {
-      output: {
-        manualChunks: {
-          "three-core": ["three"],
-          "r3f": ["@react-three/fiber", "@react-three/drei"],
-        },
-      },
+      maxParallelFileOps: 2,
     },
   },
   server: {
