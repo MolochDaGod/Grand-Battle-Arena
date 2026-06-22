@@ -1,9 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "installCommand": "pnpm install",
-  "buildCommand": "pnpm --filter grand-battle-arena run build",
+  "installCommand": "pnpm install --filter grand-battle-arena...",
+  "buildCommand": "NODE_OPTIONS='--max-old-space-size=3072' pnpm --filter grand-battle-arena run build",
   "outputDirectory": "artifacts/grudge-warlords/dist",
-  "framework": "vite",
+  "framework": null,
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]
